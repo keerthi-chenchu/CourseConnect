@@ -6,9 +6,11 @@ const courseRoute = require("./routes/courseRoutes")
 const authRoute = require("./routes/authRoutes")
 
 const app = express()
+const cors = require("cors")
 
 dns.setServers(["1.1.1.1","8.8.8.8"])
 app.use(express.json())
+app.use(cors())
 app.use("/api/courses", courseRoute)
 app.use("/api/auth", authRoute)
 
