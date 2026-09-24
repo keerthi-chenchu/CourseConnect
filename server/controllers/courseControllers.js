@@ -1,69 +1,4 @@
 
-// const Course = require('../models/course')
-// async function getCourses(req, res) {
-//     try{
-//         const courses = await Course.find()
-//         return res.status(200).send(courses)
-//     }catch(error){
-//         return res.status(500).send({
-//             message:"Unable to access course"
-//         })
-//     }  
-// }
-// async function createCourses(req, res) {
-//     try{
-//         const {title,description,category,level,price,duration} = req.body
-//         if(!title || !description || !category || !level || !price == undefined || !duration){
-//             return res.status(400).send({
-//               message:"Bad request"
-//     })
-// }
-// const course = new Course({
-//     title:title,
-//     description :description,
-//     instructor:req.user._id,
-//     category:category,
-//     level:level,
-//     price:price,
-//     duration:duration
-
-// })
-// await course.save()
-// return res.status(200).send({
-//     message:"New course created"
-// })
-//     }catch(error){
-//         return res.status(500).send({
-//             message:"Unable to create course"
-//         })
-//     }
-// }
-
-
-// async function deleteCourses(req, res) {
-//     try{
-
-//     }
-// }
-// async function updateCourses(req, res) {
-   
-// }
-
-// async function getCoursesById(req, res) {
-
-    
-
-    
-// }
-
-// module.exports = {
-//     getCourses,
-//     createCourses,
-//     deleteCourses,
-//     updateCourses,
-//     getCoursesById
-// }
-
 
 
 const Course = require('../models/course')
@@ -146,38 +81,56 @@ async function deleteCourses(req, res) {
             })
         }
 
+        // if (
+        //     req.user.role !== "instructor" &&
+        //     (!course.instructor || !course.instructor.equals(req.user_id))
+        // ) {
+        //     return res.status(403).send({
+        //         message: "you can only delete courses you created"
+        //     })
+        // }
+
+        await course.deleteOne({_id:id})
+
         return res.status(200).send({
-            message: "Course deleted successfully"
+            message : "Course deleted"
         })
-
-    } catch (error) {
-
+    }catch(error){
         return res.status(500).send({
             message: "Unable to delete course"
         })
     }
 }
 
-
 async function updateCourses(req, res) {
     try {
 
         const { id } = req.params
 
-        const course = await Course.findByIdAndUpdate(
-            id,
-            req.body,
-            { new: true }
-        )
-
-        if (!course) {
+        const course = await Course.findById(id)
+           if(!course){
             return res.status(404).send({
-                message: "Course not found"
+                message:"Course not found"
             })
+           }
+           const editableFields=[
+            "title",
+            "description",
+            "category",
+            "level",
+            "price",
+            "duration"
+        ]
+
+       editableFields.forEach((fields)=>{
+        if(req.body[fields] !== undefined){
+            course[fields]=req.body[fields]
         }
-
-        return res.status(200).send(course)
-
+       })
+       await course.save()
+       return res.status(200).send({
+        message:"Course Updated"
+       })
     } catch (error) {
 
         return res.status(500).send({
@@ -196,7 +149,7 @@ async function getCoursesById(req, res) {
 
         if (!course) {
             return res.status(404).send({
-                message: "Course not found"
+                message: "Bad Request:Course not found"
             })
         }
 
@@ -204,9 +157,7 @@ async function getCoursesById(req, res) {
 
     } catch (error) {
 
-        return res.status(500).send({
-            message: "Unable to access course"
-        })
+       console.log("Hello")
     }
 }
 
